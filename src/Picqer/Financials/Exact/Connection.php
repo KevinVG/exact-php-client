@@ -11,6 +11,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
+use App\Utility\Aws\Log;
 
 /**
  * Class Connection.
@@ -599,13 +600,13 @@ class Connection
                 ];
             }
 
-            Log::info('exact-online-acquire-refresh-tokens', 'Retrieve new tokens', [
+            Log::info('exact-online-acquire-refresh-tokens', 'Retrieve new tokens A', [
                 'refresh_token' => $this->refreshToken,
             ]);
 
             $response = $this->client()->post($this->getTokenUrl(), $body);
 
-            Log::info('exact-online-acquire-refresh-tokens', 'Retrieve new tokens', [
+            Log::info('exact-online-acquire-refresh-tokens', 'Retrieve new tokens B', [
                 'refresh_token' => $this->refreshToken,
                 'request' => [
                     'body' => $body,
