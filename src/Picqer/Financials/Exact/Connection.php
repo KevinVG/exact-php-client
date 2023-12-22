@@ -599,7 +599,23 @@ class Connection
                 ];
             }
 
+            Log::info('exact-online-acquire-refresh-tokens', 'Retrieve new tokens', [
+                'refresh_token' => $this->refreshToken,
+            ]);
+
             $response = $this->client()->post($this->getTokenUrl(), $body);
+
+            Log::info('exact-online-acquire-refresh-tokens', 'Retrieve new tokens', [
+                'refresh_token' => $this->refreshToken,
+                'request' => [
+                    'body' => $body,
+                ],
+                'response' => [
+                    'status' => $response->getStatusCode(),
+                    'headers' => $response->getHeaders(),
+                    'body' => $response->getBody(),
+                ]
+            ]);
 
             Psr7\Message::rewindBody($response);
             $body = json_decode($response->getBody()->getContents(), true);
@@ -616,6 +632,19 @@ class Connection
                 throw new ApiException('Could not acquire tokens, json decode failed. Got response: ' . $response->getBody()->getContents());
             }
         } catch (BadResponseException $ex) {
+            Log::error('exact-online-acquire-refresh-tokens', 'Retrieve new tokens error', [
+                'refresh_token' => $this->refreshToken,
+                'request' => [
+                    'headers' => $ex->getRequest()->getHeaders(),
+                    'body' => $ex->getRequest()->getBody(),
+                ],
+                'response' => [
+                    'status' => $ex->getResponse()->getStatusCode(),
+                    'headers' => $ex->getResponse()->getHeaders(),
+                    'body' => $ex->getResponse()->getBody(),
+                ]
+            ]);
+
             $this->parseExceptionForErrorMessages($ex);
         } finally {
             if (is_callable($this->acquireAccessTokenUnlockCallback)) {
